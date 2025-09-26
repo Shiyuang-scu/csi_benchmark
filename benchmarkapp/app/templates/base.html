@@ -1,0 +1,178 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('.static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block title %}
+    {% if title %}{{ title }} - CSI Benchmark{% else %}CSI Benchmark{% endif %}
+{% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-default navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('index') }}">CSI Benchmark</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">Other teams<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            {% for u in users %}
+                                <li><a href="/user/{{ u.username }}">{{ u.username }}</a>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{{ url_for('download') }}">Download models</a></li>
+                    {% if current_user.is_anonymous %}
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('upload_file') }}">Upload File</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false"> {{ current_user.username }}<span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
+                                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <body>
+    <div id="main" class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block app_content %}{% endblock %}
+
+        <footer class="footer">
+
+            <!-- Footer Links -->
+            <div class="container-fluid text-center text-md-left">
+
+                <!-- Grid row -->
+                <div class="row">
+
+                    <!-- Grid column -->
+                    <div class="col-md-6 mt-md-0 mt-3">
+
+                        {#          <!-- Content -->#}
+                        {#          <h5 class="text-uppercase">&nbsp</h5>#}
+                        {#          <p>This website has been created for the purpose of a course at <a href="https://www.enseeiht.fr/fr/index.html">ENSEEIHT</a></p>#}
+
+                    </div>
+                    <!-- Grid column -->
+
+                    <hr class="clearfix w-100 d-md-none pb-3">
+
+                    <!-- Grid column -->
+                    <div class="col-md-4 mb-md-0 mb-4">
+
+                        <!-- Links -->
+                        <h5 class="text-uppercase">Liens vers les papiers</h5>
+
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="http://portal.acm.org/citation.cfm?doid=237170.237216">
+                                    Progressive Meshes - H. Hoppe</a>
+                            </li>
+                            <li>
+                                <a href="http://graphics.im.ntu.edu.tw/docs/web3d02fu.pdf">
+                                    Multiresolution Streaming Mesh - Bing-Yu Chen</a>
+                            </li>
+                            <li>
+                                <a href="https://www.cs.cmu.edu/~./garland/Papers/quadrics.pdf">Quadric Error Metrics -
+                                    M. Garland et al.</a>
+                            </li>
+                            {#            <li>#}
+                            {#              <a href="http://cm-bell-labs.github.io/who/wim/papers/normalmesh/normalmesh.pdf">Normal meshes - Guskov et al.</a>#}
+                            {#            </li>#}
+
+                        </ul>
+                    </div>
+
+                    <div class="col-md-4 mb-md-0 mb-4">
+
+                        <!-- Links -->
+                        <h5 class="text-uppercase">Liens vers les autres papiers</h5>
+                        <!-- Grid column -->
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="https://www.researchgate.net/publication/3410885_Compressed_Progressive_Meshes">Compressed
+                                    Progressive Meshes - Pajarola et al.</a>
+                            </li>
+                            <li>
+                                <a href="https://www.ifi.uzh.ch/dam/jcr:ffffffff-82b7-d340-ffff-ffffab51c306/SQUEEZE.pdf">
+                                    Squeeze - Pajarola et al.</a>
+                            </li>
+                            <li>
+                                <a href="https://www.tau.ac.il/~levin/vis99-dco.pdf">Progressive Compression - D.
+                                    Cohen-Or et al.</a>
+                            </li>
+                            <li>
+                                <a href="http://www.geometry.caltech.edu/pubs/AD_progressive.pdf">Progressive
+                                    Compression - P. Alliez et al.</a>
+                            </li>
+                            <li>
+                                <a href="https://dl.acm.org/doi/abs/10.1145/280814.280828">MAPS - Lee et al.</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Grid column -->
+                    <div class="col-md-4 mb-md-0 mb-4">
+
+                        <!-- Links -->
+                        <h5 class="text-uppercase">Métriques utilisées</h5>
+
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="http://onlinelibrary.wiley.com/doi/abs/10.1111/1467-8659.00236">Hausdorff
+                                    Distance</a>
+                            </li>
+                            <li>
+                                <a href="http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=3DEC87C505EE57455D3E43B3A986A902?doi=10.1.1.587.6664&rep=rep1&type=pdf">Middleburry
+                                    Benchmark</a>
+                            </li>
+                            <li>
+                                <a href="https://projet.liris.cnrs.fr/imagine/pub/proceedings/SGP-2011/pdf/v30i5pp1427-1437.pdf">MSDM2</a>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="footer-copyright text-center py-3">
+                <p>This website has been created for the purpose of a course at <a
+                        href="https://www.enseeiht.fr/fr/index.html">ENSEEIHT</a></p>
+                © 2023 : Alcouffe Rémy
+            </div>
+            <br>
+            <br>
+        </footer>
+    </div>
+    </body>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>Download the models</h1>
+    <table class="table table-striped table-hover .table-responsive">
+        <thead>
+        <tr>
+            <th style="text-align:center">Model name</th>
+            <th style="text-align:center">Manifold</th>
+            <th style="text-align:center">Watertight</th>
+            <th style="text-align:center"># Vertices</th>
+            <th style="text-align:center"># Faces</th>
+            <th style="text-align:center">Download</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for model in models %}
+            <tr>
+                <td>{{ model }}</td>
+                <td>{{ models[model]["manifoldness"] }}</td>
+                <td>{{ models[model]["watertight"] }}</td>
+                <td>{{ models[model]["vertices"] }}</td>
+                <td>{{ models[model]["faces"] }}</td>
+                <td><a href="{{ url_for('download_model', model=model) }}">Download</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+{% endblock %}

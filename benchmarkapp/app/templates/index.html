@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <h3>Bienvenue dans l'UE Streaming, Décompression et Intéraction.</h3>
+    <h5>Ce site a pour objectif de pouvoir vérifier vos
+        taux de compression de maillage face à différentes métriques.</h5>
+    <canvas id="quality_canvas" width="400" height="200"></canvas>
+    <canvas id="middleburry_acc_canvas" width="400" height="200"></canvas>
+    <canvas id="middleburry_comp_canvas" width="400" height="200"></canvas>
+    <canvas id="size_canvas" width="400" height="200"></canvas>
+    <script>
+        var colours = ['#332288', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77', '#CC6677', '#882255', '#AA4499'];
+        var index = 0;
+        new Chart.Scatter(document.getElementById("quality_canvas"), {
+            type: 'line',
+            data: {
+                datasets: [
+                    {% for s in best_submits %}
+                        {
+                            data: [
+                                {% for abs,ord in zip(format_tabs(s[1].tab_absc),format_tabs(s[1].tab_hausdorff)) %}
+                                    {y: {{ord}}, x:{{abs}}},
+                                {% endfor %}
+                            ],
+                            label: "{{s[0]}}",
+                            borderColor: colours[index++],
+                            showline: true,
+                        },
+                    {% endfor %}
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Précision du modèle en fonction du nombre de bits transmis (Distance de Hausdorff)'
+                },
+                scales: {
+                    xAxes: [{scaleLabel: {display: true, labelString: 'Nombre de bits transmis'}}],
+                    yAxes: [{scaleLabel: {display: true, labelString: 'Précision de la compression'}}]
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            const dataset = data.datasets[tooltipItem.datasetIndex];
+                            const index = tooltipItem.index;
+                            return dataset.labels[index] + ' : ' + dataset.data[index];
+                        }
+                    }
+                }
+            }
+        });
+        var colours = ['#332288', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77', '#CC6677', '#882255', '#AA4499'];
+        var index = 0;
+        new Chart.Scatter(document.getElementById("middleburry_acc_canvas"), {
+            type: 'line',
+            data: {
+                datasets: [
+                    {% for s in best_submits %}
+                        {
+                            data: [
+                                {% for abs,ord in zip(format_tabs(s[1].tab_absc),format_tabs(s[1].tab_middle_accurracy)) %}
+                                    {y: {{ord}}, x:{{abs}}},
+                                {% endfor %}
+                            ],
+                            label: "{{s[0]}}",
+                            borderColor: colours[index++],
+                            showline: true,
+                        },
+                    {% endfor %}
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Précision du modèle en fonction du nombre de bits transmis (Middleburry)'
+                },
+                scales: {
+                    xAxes: [{scaleLabel: {display: true, labelString: 'Pourcentage de bits transmis'}}],
+                    yAxes: [{scaleLabel: {display: true, labelString: 'Précision du maillage'}}]
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            const dataset = data.datasets[tooltipItem.datasetIndex];
+                            const index = tooltipItem.index;
+                            return dataset.labels[index] + ' : ' + dataset.data[index];
+                        }
+                    }
+                }
+            }
+        });
+        var colours = ['#332288', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77', '#CC6677', '#882255', '#AA4499'];
+        var index = 0;
+        new Chart.Scatter(document.getElementById("middleburry_comp_canvas"), {
+            type: 'line',
+            data: {
+                datasets: [
+                    {% for s in best_submits %}
+                        {
+                            data: [
+                                {% for abs,ord in zip(format_tabs(s[1].tab_absc),format_tabs(s[1].tab_middle_completeness)) %}
+                                    {y: {{ord}}, x:{{abs}}},
+                                {% endfor %}
+                            ],
+                            label: "{{s[0]}}",
+                            borderColor: colours[index++],
+                            showline: true,
+                        },
+                    {% endfor %}
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Complétude du modèle en fonction du nombre de bits transmis'
+                },
+                scales: {
+                    xAxes: [{scaleLabel: {display: true, labelString: 'Pourcentage de bits transmis'}}],
+                    yAxes: [{scaleLabel: {display: true, labelString: 'Complétude du maillage'}}]
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            const dataset = data.datasets[tooltipItem.datasetIndex];
+                            const index = tooltipItem.index;
+                            return dataset.labels[index] + ' : ' + dataset.data[index];
+                        }
+                    }
+                }
+            }
+        });
+        var barChartData = {
+            labels: [
+                {% for s in best_submits %}
+                    "{{s[0]}}",
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Real Size',
+                backgroundColor: '#ff0000',
+                borderColor: '##ff0000',
+                borderWidth: 1,
+                data: [
+                    {% for s in best_submits %}
+                        {{s[1].real_size}},
+                    {% endfor %}
+                ]
+            }, {
+                label: 'Estimated size',
+                backgroundColor: "#00ff00",
+                borderColor: "#00ff00",
+                borderWidth: 1,
+                data: [
+                    {% for s in best_submits %}
+                        {{s[1].estimated_size}},
+                    {% endfor %}
+                ]
+            }]
+        };
+
+        new Chart(document.getElementById("size_canvas"), {
+            type: 'bar',
+            data: barChartData,
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Comparaison des tailles de fichier en octets'
+                },
+                scales: {
+                    xAxes: [{scaleLabel: {display: true, labelString: 'Modèle 3D'}}],
+                    yAxes: [{scaleLabel: {display: true, labelString: 'Taille (en octets) du modèle 3D'}}]
+                }
+            }
+        });
+    </script>
+{% endblock %}
