@@ -33,9 +33,9 @@ if not app.debug:
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
 
-    if not os.path.exists('temp'):
-        os.mkdir('temp')
-    file_handler = RotatingFileHandler('temp/benchmarkapp.log', maxBytes=10240,
+    if not os.path.exists('tmp'):
+        os.mkdir('tmp')
+    file_handler = RotatingFileHandler('tmp/benchmarkapp.log', maxBytes=10240,
                                        backupCount=10)
     file_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
