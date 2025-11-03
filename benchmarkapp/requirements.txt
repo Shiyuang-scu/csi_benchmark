@@ -12,3 +12,4 @@ WTForms
 werkzeug
 alembic
 SQLAlchemy
+gunicorn
