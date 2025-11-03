@@ -1,13 +1,22 @@
-# Gunicorn configuration for Render deployment
+# Gunicorn configuration for production deployment
+# Works for both Render.com and AWS EC2
 
+import os
 import multiprocessing
 
-# Bind to PORT environment variable
-bind = "0.0.0.0:10000"
+# Bind configuration
+# Render.com: Use PORT environment variable
+# AWS/Local: Use localhost:8000 (Nginx will proxy)
+port = os.environ.get("PORT", "8000")
+bind_host = "0.0.0.0" if os.environ.get("PORT") else "127.0.0.1"
+bind = f"{bind_host}:{port}"
 
-# Use only 1 worker to reduce memory usage
-# Free tier has limited RAM, so we prioritize not running out of memory
-workers = 1
+# Workers configuration
+# Render free tier: 1 worker (limited RAM)
+# AWS t3.small: 2 workers
+# AWS t3.medium+: 4 workers
+# Formula: (2 x CPU cores) + 1
+workers = int(os.environ.get("GUNICORN_WORKERS", 2))
 
 # Worker class
 worker_class = "sync"
@@ -19,10 +28,22 @@ timeout = 300  # 5 minutes
 keepalive = 2
 
 # Logging
-accesslog = "-"
-errorlog = "-"
+# Render: stdout/stderr
+# AWS: log files
+if os.environ.get("PORT"):
+    # Render.com - log to stdout/stderr
+    accesslog = "-"
+    errorlog = "-"
+else:
+    # AWS/Local - log to files
+    accesslog = "logs/access.log"
+    errorlog = "logs/error.log"
+
 loglevel = "info"
 
 # Memory management - restart worker after serving requests to prevent memory leaks
-max_requests = 50
-max_requests_jitter = 10
+max_requests = 1000
+max_requests_jitter = 50
+
+# Daemon mode
+daemon = False
