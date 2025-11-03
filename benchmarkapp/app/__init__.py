@@ -17,6 +17,12 @@ login.login_view = 'login'
 bootstrap = Bootstrap(app)
 app.jinja_env.filters['zip'] = zip
 
+# Create required directories if they don't exist
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+if not os.path.exists(app.config['OBJ_FOLDER']):
+    os.makedirs(app.config['OBJ_FOLDER'])
+
 if not app.debug:
     if app.config['MAIL_SERVER']:
         auth = None
